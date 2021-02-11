@@ -66,15 +66,16 @@ public class HomeController {
 
     @PostMapping("/create")
     public String addUser(@Valid User user, BindingResult result, Model model) {
-        User findUser = userRepository.findByEmail(user.getEmail());
-        if(findUser != null)
-        {
-            model.addAttribute("error", "Email already exist");
-            return "create";
-        }
         if (result.hasErrors()) {
             return "create";
         }
+
+        if(userRepository.findByEmail(user.getEmail()) != null){
+            model.addAttribute("error", "Email is used");
+            return "create";
+        }
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         userRepository.save(user);
         return "redirect:/";
