@@ -22,9 +22,6 @@ public class User {
     @Column(nullable=false)
     private String password;
 
-    @Column(nullable = true, length = 64)
-    private String photos;
-
     @ManyToMany(cascade=CascadeType.MERGE)
     @JoinTable(
             name="tblUserRoles",

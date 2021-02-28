@@ -10,4 +10,8 @@ public interface UserService {
     User getById(long id);
     void deleteById(long id);
     Page<User> findPaginated(int pageNo, int pageSize, String sortField, String sortDirection);
+
+    void createPasswordResetTokenForUser(User user, String token);
+
+    User findUserByEmail(String userEmail);
 }

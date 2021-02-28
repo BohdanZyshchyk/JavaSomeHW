@@ -1,5 +1,6 @@
 package app.service;
 
+import app.entities.PasswordResetToken;
 import app.entities.User;
 import app.repositories.UserRepository;
 import app.search.SearchCriteria;
@@ -53,7 +54,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<User> findPaginated(int pageNo, int pageSize, String sortField, String sortDirection, SearchSpecification spec) {
+    public Page<User> findPaginated(int pageNo, int pageSize, String sortField, String sortDirection) {
         Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortField).ascending() :
                 Sort.by(sortField).descending();
 
@@ -61,10 +62,15 @@ public class UserServiceImpl implements UserService {
                 new SearchSpecification(new SearchCriteria("name", ":", ""));
 
         SearchSpecification spec2 =
-                new SearchSpecification(new SearchCriteria("email", ":", "neo"));
+                new SearchSpecification(new SearchCriteria("email", ":", ""));
 
         Pageable pageable = PageRequest.of(pageNo - 1, pageSize, sort);
 
         return this.userRepository.findAll(Specification.where(spec1).and(spec2), pageable);
+    }
+
+    public void createPasswordResetTokenForUser(User user, String token) {
+        PasswordResetToken myToken = new PasswordResetToken(token, user);
+        passwordTokenRepository.save(myToken);
     }
 }
