@@ -7,7 +7,6 @@ import app.repositories.UserRepository;
 import app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @Controller
@@ -125,41 +123,5 @@ public class HomeController {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
         userRepository.delete(user);
         return "redirect:/";
-    }
-
-    @PostMapping("/user/resetPassword")
-    public String resetPassword(HttpServletRequest request,
-                                         @RequestParam("email") String userEmail) {
-        User user = userService.findUserByEmail(userEmail);
-//        if (user == null) {
-//            throw new UserNotFoundException();
-//        }
-        String token = UUID.randomUUID().toString();
-        userService.createPasswordResetTokenForUser(user, token);
-        emailService.sendSimpleMessage(constructResetTokenEmail(getAppUrl(request),
-                request.getLocale(), token, user));
-        return "redirect:/";
-    }
-
-    private String getAppUrl(HttpServletRequest request) {
-        return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-    }
-
-    private SimpleMailMessage constructResetTokenEmail(
-            String contextPath, Locale locale, String token, User user) {
-        String url = contextPath + "/user/changePassword?token=" + token;
-        String message = messages.getMessage("message.resetPassword",
-                null, locale);
-        return constructEmail("Reset Password", message + " \r\n" + url, user);
-    }
-
-    private SimpleMailMessage constructEmail(String subject, String body,
-                                             User user) {
-        SimpleMailMessage email = new SimpleMailMessage();
-        email.setSubject(subject);
-        email.setText(body);
-        email.setTo(user.getEmail());
-        email.setFrom(env.getProperty("support.email"));
-        return email;
     }
 }

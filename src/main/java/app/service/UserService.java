@@ -11,7 +11,5 @@ public interface UserService {
     void deleteById(long id);
     Page<User> findPaginated(int pageNo, int pageSize, String sortField, String sortDirection);
 
-    void createPasswordResetTokenForUser(User user, String token);
-
-    User findUserByEmail(String userEmail);
+    void resetPasswordSendEmail(User user, String domain);
 }

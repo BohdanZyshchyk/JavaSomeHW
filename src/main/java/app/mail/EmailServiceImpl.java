@@ -4,7 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+import javax.mail.internet.MimeMessage;
+import java.util.Properties;
 
 
 @Service("EmailService")
@@ -33,7 +37,6 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     private JavaMailSender emailSender;
 
-
     @Override
     public void sendSimpleMessage(String to, String subject, String text) {
         try {
@@ -50,13 +53,19 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendSimpleMessage(SimpleMailMessage message){
+    public void sendMimeMessage(String to, String subject, String text) {
         try {
-            emailSender.send(message);
+            MimeMessage mimeMessage = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+            String htmlMsg = text;
+            helper.setText(htmlMsg, true); // Use this or above line.
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setFrom(NOREPLY_ADDRESS);
+            emailSender.send(mimeMessage);
 
-        } catch (MailException exception) {
+        } catch (Exception exception) {
             exception.printStackTrace();
         }
     }
-
 }
